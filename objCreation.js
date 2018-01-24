@@ -1,5 +1,7 @@
 "use strict";
 
+// https://jsperf.com/comparison-of-methods-that-access-private-properties
+
 		let Baz = (function() {
 			let pVar = 10;
 
