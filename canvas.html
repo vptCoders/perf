@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>teste de canvas</title>
+	<script src="FFPlot.js"></script>
+</head>
+<body>
+	<div style="width: 800px; height: 500px;" id="container"></div>
+	<canvas id="cnv"></canvas>
+
+
+	<script>
+		let container = document.getElementById("container");
+		let lele = document.createElement("div");
+		let cnv = document.getElementById("cnv");
+
+
+		let leo = new FFStage();
+		leo.createStage(container);
+	</script>
+
+	<!-- <script>
+		// let lele = document.createElement('div');
+		// document.body.appendChild(lele);
+
+		let dataObj = {
+			x: [0, 1, 2, 3, 4, 5, 6],
+			y: [0, 1, 4, 9, 16, 25, 36],
+		}
+
+		let options = {
+			xAxis: true,
+			xAxisLineWidth: 1,
+			xAxisLineColor: "orangered",
+			// xAxisTitle: false,
+			xAxisTitleFont: '10px sans-serif',
+		}
+
+		let container = document.getElementById("container");
+		// let canvas = document.getElementById("canvas");
+		let leo = new LFPlot(container, "scatter", dataObj, options);
+	</script> -->
+</body>
+</html>
