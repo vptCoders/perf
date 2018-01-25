@@ -1,5 +1,32 @@
 "use strict";
 
+function FF(value) {
+			let a = 0;
+
+
+			function FF(value) {
+				a = value;
+			}
+			FF.prototype = Object.create(this.constructor.prototype);
+			FF.prototype.constructor = FF;
+
+			FF.prototype.ret = function() {
+				return a;
+			}
+
+			return new FF(value);
+		}
+
+		let leo2 = new FF(5);
+		let leo3 = new FF(10);
+
+		console.log(leo2);
+		console.log(leo3);
+		console.log(leo3 instanceof FF);
+
+		console.log(leo2.ret());
+		console.log(leo3.ret());
+
 // 	Utils:
 function isEmpty(variable) {
 	if(variable || Number.isFinite(variable)) {
