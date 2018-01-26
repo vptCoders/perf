@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<script>
+		"use strict";
+
+		function Foo() {
+			let privateVariable;
+
+			function Foo() {
+				privateVariable = Math.random();
+			}
+			/***********************************************************************************************
+			/*	The next line makes sure that:
+			/*		console.log(obj1 instanceof Foo)
+			/*	returns true.
+			/***********************************************************************************************/
+			Foo.prototype = Object.create(this.constructor.prototype);
+
+			Foo.prototype.printPrivateVariable = function() {
+				return privateVariable;
+			}
+
+			/***********************************************************************************************
+			/*	The next line makes sure that children of Foo can actually use its prototype methods.
+			/***********************************************************************************************/
+			this.constructor.prototype = Foo.prototype;
+			return new Foo();
+		}
+
+
+
+		function Bar() {
+			let _parentObj = new Foo();
+			this.constructor.prototype = Object.create(_parentObj);
+
+			function Bar() {
+			}
+			Bar.prototype = Object.create(this.constructor.prototype);
+
+			Bar.prototype.printFromBar = function() {
+				console.log("Yes, I can call a method from Bar's prototype!");
+			}
+
+			this.constructor.prototype = Bar.prototype;
+			return new Bar();
+		}
+
+		function Baz() {
+			let _parent = new Bar();
+			this.constructor.prototype = Object.create(_parent);
+
+			function Baz() {
+			}
+			Baz.prototype = Object.create(this.constructor.prototype);
+
+			Baz.prototype.printFromBaz = function() {
+				console.log("Yes, I can call a method from Baz's prototype!");
+			}
+
+			this.constructor.prototype = Baz.prototype;
+			return new Baz();
+		}
+
+		function Qux() {
+			let _parent = new Baz();
+			this.constructor.prototype = Object.create(_parent);
+
+			function Qux() {
+			}
+			Qux.prototype = Object.create(this.constructor.prototype);
+
+			Qux.prototype.printFromQux = function() {
+				console.log("Jesus Christ! Haven't I proven to you that I can access my parents' methods? Would you think I wouldn't be able to access my own methods? Yes, of course I can call a method from Qux's prototype.");
+			}
+
+			this.constructor.prototype = Qux.prototype;
+			return new Qux();
+		}
+
+
+		let obj1 = new Foo();
+		console.log("Is obj1 an instance of Foo?");
+		console.log(obj1 instanceof Foo);
+		console.log('');
+
+		let obj2 = new Qux();
+		console.log("Is obj2 an instance of Foo?");
+		console.log(obj2 instanceof Foo);
+		console.log('');
+		console.log("Is obj2 an instance of Bar?");
+		console.log(obj2 instanceof Bar);
+		console.log('');
+		console.log("Is obj2 an instance of Baz?");
+		console.log(obj2 instanceof Baz);
+		console.log('');
+		console.log("Is obj2 an instance of Qux?");
+		console.log(obj2 instanceof Qux);
+		console.log('');
+		console.log("Can obj2 call Foo's methods that returns a private variable?");
+		console.log(obj2.printPrivateVariable());
+		console.log('');
+		console.log("Can obj2 call a method from Bar's prototype?");
+		obj2.printFromBar();
+		console.log('');
+		console.log("Can obj2 call a method from Baz's prototype?");
+		obj2.printFromBaz();
+		console.log('');
+		console.log("Can obj2 call a method from Qux's prototype?");
+		obj2.printFromQux();
+		console.log('');
+		console.log("Are obj1 and obj2 private variables independent? If so, obj1.printPrivateVariable() === obj2.printPrivateVariable() should return false, UNLESS, by a fenomenal coincidence, Math.random() generates the same number when both obj1 and obj2 are instantiated...");
+		console.log(obj1.printPrivateVariable() === obj2.printPrivateVariable());
+		console.log('');
+		console.log("obj1 privateVariable is:");
+		console.log(obj1.printPrivateVariable());
+		console.log('');
+		console.log("obj2 privateVariable is:");
+		console.log(obj2.printPrivateVariable());
+		console.log('');
+	</script>
+</body>
+</html>
