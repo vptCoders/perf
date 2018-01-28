@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>teste</title>
+</head>
+<body>
+	<script>
+		"use strict";
+
+/*		function Foo() {
+			let a = Math.random();
+
+			Foo.prototype.hi = function() {
+				console.log("hi");
+			}
+			Foo.prototype.ret = function() {
+				console.log(a);
+			}
+		}
+
+
+
+		function Baz() {
+			// 	This private variable is different for each instance, but common to all instances of objects that inherit from Baz if object is normal, but different for each instance if object inside object
+			let a = Math.random();
+
+			// function Baz() {
+			// }
+			// Baz.prototype = Object.create(this.constructor.prototype);
+			// Baz.prototype.constructor = Baz;
+
+			Baz.prototype.ret = function() {
+				return a;
+			}
+
+			// return new Baz();
+		}
+
+
+
+		// function Bar() {
+			function Bar() {
+
+			}
+			Bar.prototype = new Baz();
+			Bar.prototype.constructor = Bar;
+			Bar.prototype.bye = function() {
+				console.log("bye");
+			}
+			Bar.prototype.jj = function() {
+				console.log(this.ret());
+			}
+
+			// return new Bar();
+		// }
+		// Bar.prototype = new Baz();
+		// Bar.prototype.constructor = Bar;
+
+
+
+		let leo = new Bar();
+		let leo2 = new Bar();
+
+		leo.jj();
+		leo2.jj();*/
+
+
+
+
+
+		let FF = (function() {
+			let a = Math.random();	// is the same value for all instances of FF.Foo
+
+/*			function Leo() {
+				this.leo = "leo";
+			}
+			Leo.prototype.ret = function() {
+				console.log(this.leo);
+			}*/
+
+
+			let g = function(value) {
+				let a = Math.random();
+
+				function Leo() {
+
+				}
+				Leo.prototype.ret = function() {
+					console.log("olá eu sou o leandro.");
+					console.log(a);
+				}
+
+
+				function Daniel() {
+
+				}
+				Daniel.prototype = new Leo(); 				//	Parent class;
+				Daniel.prototype.constructor = Daniel;		// 	I need to know I am not my parent.
+
+				Daniel.prototype.smile = function() {
+					this.ret();
+					console.log("também daniel");
+					console.log(a);
+				}
+
+				switch(value) {
+					case "Leo":
+						return Leo;
+						break;
+					case "Daniel":
+						return Daniel;
+						break;
+				}
+			};
+
+
+			let FF = {
+				Baz: function() {
+					let c = Math.random();
+
+					function Baz() {
+					}
+					// Baz.prototype = Object.create(this.constructor.prototype);
+					// Baz.prototype.constructor = Baz;
+
+					Baz.prototype.ret = function() {
+						console.log(c);
+					}
+
+					this.constructor.prototype = Baz.prototype;
+					return new Baz();
+				},
+
+
+
+				Foo: function() {
+					let b = Math.random();
+					// let leo = new Leo();
+
+					function Foo() {
+						// leo.ret();
+					}
+					Foo.prototype = new FF.Baz(); 			//	Parent class;
+					Foo.prototype.constructor = Foo;		// 	I need to know I am not my parent.
+
+					Foo.prototype.smile = function() {
+						console.log(b);
+					}
+
+					Foo.prototype.printA = function() {
+						console.log(a);
+					}
+
+					this.constructor.prototype = Foo.prototype; 	//	Makes sure Foo instance instanceof Foo returns true
+					return new Foo();
+				},
+
+				Leo: g("Leo"),
+
+/*				Daniel: function() {
+					let Daniel = g("Daniel");
+					let smile = Daniel.prototype.smile;
+					Daniel.prototype = new FF.Leo();
+					Daniel.prototype.constructor = Daniel.constructor;
+
+					Daniel.prototype.smile = smile;
+
+					this.constructor.prototype = Daniel.prototype;
+					return new Daniel();
+				},*/
+
+				// Daniel: g("Daniel"),
+
+				Daniel: function() {
+					let _e = g("Daniel");
+					let Daniel = g("Daniel");
+					Daniel.prototype = new FF.Leo();
+					Daniel.prototype.constructor = Daniel.constructor;
+
+					Daniel.prototype.smile = _e.prototype.smile;
+					Daniel.prototype.ret = _e.prototype.ret;
+
+					this.constructor.prototype = Daniel.prototype;
+					return new Daniel();
+				},
+			};
+
+			return FF;
+		})();
+
+
+
+
+		function Baz() {
+			let a = Math.random();
+
+			function Baz() {
+			}
+			// Baz.prototype = Object.create(this.constructor.prototype);
+			// Baz.prototype.constructor = Baz;
+
+			Baz.prototype.ret = function() {
+				return a;
+			}
+
+			this.constructor.prototype = Baz.prototype;
+			return new Baz();
+		}
+
+		function Foo() {
+			let b = Math.random();
+
+			function Foo() {
+
+			}
+			Foo.prototype = new Baz(); 			//	Parent class;
+			Foo.prototype.constructor = Foo;	// 	I need to know I am not my parent.
+
+			Foo.prototype.smile = function() {
+				return b;
+			}
+
+			this.constructor.prototype = Foo.prototype; 	//	Makes sure Foo instance instanceof Foo returns true
+			return new Foo();
+		}
+
+
+/*		function Foo() {
+			let a = Math.random();
+
+			Foo.prototype.ret = function() {
+				return a;
+			}
+		}
+
+		function Bar() {
+			this.a = Math.random();
+		}
+
+		Bar.prototype.ret = function() {
+			return this.a;
+		}
+
+
+		function Variables() {
+			this.a = Math.random();
+		}
+
+
+		function Qux() {
+		}
+		Qux.prototype = new Variables();
+		Qux.prototype.constructor = Qux;
+
+		Qux.prototype.ret = function() {
+			return this.a;
+		}*/
+
+/*		let leo = new Foo();
+		let leo2 = new Foo();
+		let leo3 = new leo2.constructor(); // the private variables are linked between leo2 and leo3
+
+		console.log(leo.ret());
+		console.log(leo2.ret());
+		console.log(leo.smile());
+		console.log(leo2.smile());*/
+
+
+
+
+
+
+/*		let leo = new FF.Foo();
+		let leo2 = new FF.Foo();
+
+		leo.printA();
+		leo2.printA();
+
+		leo.smile();
+		leo2.smile();*/
+
+
+		let daniel = new FF.Daniel();
+		daniel.ret();
+		daniel.smile();
+
+		console.log(daniel instanceof FF.Leo);
+		console.log(daniel instanceof FF.Daniel);
+
+		let leo = new FF.Leo();
+		console.log(leo instanceof FF.Leo);
+		leo.ret();
+
+
+	</script>
+</body>
+</html>
