@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>teste de spreadsheet</title>
+
+	<style>
+		body {
+			background-color: rgb(220, 220, 220);
+		}
+		table {
+			border-collapse: collapse;
+			user-select: none;
+			cursor: pointer;
+		}
+
+		th, td {
+			border: 1px solid black;
+		}
+
+		div.container {
+			position: relative;
+			background-color: white;
+			display: inline-block;
+			width: auto;
+			height: 600px;
+			overflow: scroll;
+			border-radius: 3px;
+			margin-left: 100px;
+			padding: 30px 100px;
+			box-shadow: 2px 2px 3px 1px rgb(160, 160, 160);
+		}
+
+		div.cellsHighlighter {
+			display: inline-block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			box-sizing: border-box;
+			border: 2px solid green;
+			box-shadow: 0px 0px 0px 1px white inset;
+			visibility: hidden;
+			pointer-events: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<table id="tabela">
+			<thead>
+				<tr>
+					<th>coluna 1</th>
+					<th>coluna 2</th>
+					<th>coluna 3</th>
+					<th>coluna 4</th>
+					<th>coluna 5</th>
+					<th>coluna 6</th>
+					<th>coluna 7</th>
+					<th>coluna 8</th>
+					<th>coluna 9</th>
+					<th>coluna 10</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	<div class="container">
+		<table id="tabela2">
+			<thead>
+				<tr>
+					<th>coluna 1</th>
+					<th>coluna 2</th>
+					<th>coluna 3</th>
+					<th>coluna 4</th>
+					<th>coluna 5</th>
+					<th>coluna 6</th>
+					<th>coluna 7</th>
+					<th>coluna 8</th>
+					<th>coluna 9</th>
+					<th>coluna 10</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+
+	<script>
+		let tabela = document.getElementById("tabela");
+		for(let _curRow = 0; _curRow < 100; _curRow++) {
+			let newRow = document.createElement("tr");
+			for(_curCol = 1; _curCol <= 10; _curCol++) {
+				let newCol = document.createElement("td");
+				newCol.textContent = _curRow + ' x ' + _curCol;
+				newRow.appendChild(newCol);
+			}
+			tabela.getElementsByTagName('tbody')[0].appendChild(newRow);
+		}
+
+
+		let tabela2 = document.getElementById("tabela2");
+		let init = window.scrollY;
+
+		let SpreadSheet = {
+			dataTables: [tabela, tabela2],
+			container: tabela.parentElement,
+		};
+
+
+		let SelectedCellsManager = (function(SpreadSheet) {
+			let mouseDownTarget = {
+				targetElement: null,
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0,
+			};
+			let mouseUpTarget = null;
+			let cellsHighlighter = document.createElement("div");
+			cellsHighlighter.classList.add("cellsHighlighter");
+			let containerBCR = SpreadSheet.container.getBoundingClientRect();
+			SpreadSheet.container.appendChild(cellsHighlighter);
+
+			function setCellSelectionEvents(dataTables) {
+				let _qtyDataTables = 0;
+				if(dataTables && dataTables.constructor === Array) {
+					_qtyDataTables = dataTables.length;
+				}
+
+				for(_curTable = 0; _curTable < _qtyDataTables; _curTable++) {
+					let mouseDownCallback = mouseEventCallback.bind(null, mouseDownTarget);
+					dataTables[_curTable].addEventListener("mousedown", mouseDownCallback);
+
+					dataTables[_curTable].addEventListener("mouseup", 
+						function(evt) {
+							if(	evt.target && 
+								evt.target.tagName && 
+							   (evt.target.tagName.toLowerCase() === "td" || 
+							   	evt.target.tagName.toLowerCase() === "th")) {
+									//	Valid target cell. Save it. 
+									mouseUpTarget = evt.target;
+									// 	Shall remove the mousemove event of the document, created in the mousedown event...
+									updateCellsHighlighter();
+							}
+						}
+					);
+				}
+			}
+
+			function mouseEventCallback(mouseTarget, evt) {
+				// console.log(mouseTarget);
+				if(	evt.target && evt.target.tagName && 
+				   (evt.target.tagName.toLowerCase() === "td" || 
+					evt.target.tagName.toLowerCase() === "th")) {
+					//	Valid target cell. Save it. 
+					mouseTarget.targetElement = evt.target;
+				}
+
+				console.log(mouseTarget);
+			}
+
+			function updateMouseTarget() {
+				//set x, y, width, height...
+			}
+
+			function updateCellsHighlighter() {
+				setTimeout(function() {
+					let mouseDownTargetBCR = mouseDownTarget.getBoundingClientRect();
+					let mouseUpTargetBCR = mouseUpTarget.getBoundingClientRect();
+
+					let leftMostCell = (mouseDownTargetBCR.x < mouseUpTargetBCR.x) ? mouseDownTarget : mouseUpTarget;
+					let leftMostCellBCR = leftMostCell.getBoundingClientRect();
+					let leftMostCellXPosition = leftMostCellBCR.x;
+
+					let rightMostCell = (leftMostCell === mouseUpTarget) ? mouseDownTarget : mouseUpTarget;
+					let rightMostCellBCR = rightMostCell.getBoundingClientRect();
+					let rightMostCellXPosition = rightMostCellBCR.x;
+					let rightMostCellWidth = rightMostCellBCR.width;
+
+					let topMostCell = (mouseDownTargetBCR.y < mouseUpTargetBCR.y) ? mouseDownTarget : mouseUpTarget;
+					let topMostCellYPosition = topMostCell.getBoundingClientRect().y;
+
+					let bottomMostCell = (topMostCell === mouseUpTarget) ? mouseDownTarget : mouseUpTarget;
+					let bottomMostCellYPosition = bottomMostCell.getBoundingClientRect().y;
+					let bottomMostCellHeight = bottomMostCell.getBoundingClientRect().height;
+
+
+					let leftOffset = leftMostCellXPosition - containerBCR.x - 1;
+					let topOffset = topMostCellYPosition - containerBCR.y - 1 - init + window.scrollY + SpreadSheet.container.scrollTop;
+					let widthCalc = rightMostCellXPosition + rightMostCellWidth - leftMostCellXPosition + 3;
+					let heightCalc = bottomMostCellYPosition + bottomMostCellHeight - topMostCellYPosition + 3;
+
+					cellsHighlighter.style.cssText += 	"width: " + widthCalc + "px; " + 
+														"height: " + heightCalc + "px; " +
+														"left: " + leftOffset + "px; " +
+														"top: " + topOffset + "px; " +
+														"visibility: visible";
+				}, 0);
+			}
+
+			setCellSelectionEvents(SpreadSheet.dataTables);
+		})(SpreadSheet);
+	</script>
+</body>
+</html>
