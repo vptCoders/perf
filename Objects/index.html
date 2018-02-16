@@ -20,7 +20,7 @@
 			background-color: white;
 			display: inline-block;
 			width: auto;
-			height: 600px;
+			height: 800px;
 			overflow: scroll;
 			border-radius: 3px;
 			margin-left: 100px;
@@ -178,6 +178,26 @@
 					parseTargetElement(newTarget);
 				}
 			});
+			Object.defineProperty(MouseTarget.prototype, 'top', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.top : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'bottom', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.bottom : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'left', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.left : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'right', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.right : null; 
+				},
+			});
 
 			// 	Public methods:
 			MouseTarget.prototype.leftMost = function(otherTarget) {
@@ -327,20 +347,33 @@
 
 			function updateCellsHighlighter() {
 				setTimeout(function() {
+
+					let mouseDownTargetYPos = mouseDownTarget.y - init + window.scrollY + meInit;
+					let mouseUpTargetYPos = mouseUpTarget.y - init + window.scrollY + SpreadSheet.container.scrollTop;
+
 					let leftTarget = mouseDownTarget.leftMost(mouseUpTarget);
 					let rightTarget = mouseDownTarget.rightMost(mouseUpTarget);
-					let topTarget = mouseDownTarget.topMost(mouseUpTarget);
-					let bottomTarget = mouseDownTarget.bottomMost(mouseUpTarget);
+					let topTarget = (mouseDownTargetYPos < mouseUpTargetYPos) ? mouseDownTarget : mouseUpTarget;
+					let bottomTarget = (topTarget === mouseUpTarget) ? mouseDownTarget : mouseUpTarget;
 
-					let leftOffset = leftTarget.x - containerBCR.x - 1;
-					let topOffset = topTarget.y - containerBCR.y - 1 - init + window.scrollY + meInit;
-					let widthCalc = rightTarget.x + rightTarget.width - leftTarget.x + 3;
+					let leftOffset = leftTarget.left - containerBCR.left - 1;
+					let topOffset = topTarget.y - containerBCR.y - 1 + window.scrollY - init + meInit;
+					let widthCalc = rightTarget.right - leftTarget.left + 3;
 					let heightCalc = bottomTarget.y + bottomTarget.height - topTarget.y + 3 + SpreadSheet.container.scrollTop - meInit;
+					// heightCalc = 40;
+
+					console.log(SpreadSheet.container.scrollTop - meInit);
+					console.log('heightCalc: ' + heightCalc);
+					console.log('topoffset:' + topOffset);
+					console.log("topTarget: " + topTarget.y);
+
+
 					cellsHighlighter.style.cssText += 	"width: " + widthCalc + "px; " + 
 														"height: " + heightCalc + "px; " +
 														"left: " + leftOffset + "px; " +
 														"top: " + topOffset + "px; " +
 														"visibility: visible";
+
 				}, 0);
 			}
 			setCellSelectionEvents(SpreadSheet.dataTables);
