@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>teste de spreadsheet</title>
+
+	<style>
+		body {
+			background-color: rgb(220, 220, 220);
+		}
+		table {
+			border-collapse: collapse;
+			user-select: none;
+			cursor: pointer;
+		}
+		th, td {
+			border: 1px solid black;
+		}
+		div.container {
+			position: relative;
+			background-color: white;
+			display: inline-block;
+			width: auto;
+			height: 800px;
+			overflow: scroll;
+			border-radius: 3px;
+			margin-left: 100px;
+			padding: 30px 100px;
+			box-shadow: 2px 2px 3px 1px rgb(160, 160, 160);
+		}
+		div.cellsHighlighter {
+			display: inline-block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			box-sizing: border-box;
+			border: 2px solid green;
+			box-shadow: 0px 0px 0px 1px white inset;
+			visibility: hidden;
+			pointer-events: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<table id="tabela">
+			<thead>
+				<tr>
+					<th>coluna 1</th>
+					<th>coluna 2</th>
+					<th>coluna 3</th>
+					<th>coluna 4</th>
+					<th>coluna 5</th>
+					<th>coluna 6</th>
+					<th>coluna 7</th>
+					<th>coluna 8</th>
+					<th>coluna 9</th>
+					<th>coluna 10</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	<div class="container">
+		<table id="tabela2">
+			<thead>
+				<tr>
+					<th>coluna 1</th>
+					<th>coluna 2</th>
+					<th>coluna 3</th>
+					<th>coluna 4</th>
+					<th>coluna 5</th>
+					<th>coluna 6</th>
+					<th>coluna 7</th>
+					<th>coluna 8</th>
+					<th>coluna 9</th>
+					<th>coluna 10</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+
+	<script>
+		let tabela = document.getElementById("tabela");
+		tabela.addEventListener("dragstart", function(evt) {
+			return false;
+		});
+		tabela.parentElement.addEventListener("dragstart", function(evt) {
+			return false;
+		});
+		for(let _curRow = 0; _curRow < 100; _curRow++) {
+			let newRow = document.createElement("tr");
+			for(_curCol = 1; _curCol <= 10; _curCol++) {
+				let newCol = document.createElement("td");
+				newCol.textContent = _curRow + ' x ' + _curCol;
+				newRow.appendChild(newCol);
+			}
+			tabela.getElementsByTagName('tbody')[0].appendChild(newRow);
+		}
+		let tabela2 = document.getElementById("tabela2");
+		let init = window.scrollY;
+		let SpreadSheet = {
+			dataTables: [tabela, tabela2],
+			container: tabela.parentElement,
+		};
+		function MouseTarget(targetElement) {
+			// 	Private properties:
+			let _targetElement = null;
+			let _targetElementBCR = null;
+			// 	Private methods:
+			function parseTargetElement(targetEl) {
+				if(targetEl) {
+					_targetElement = targetEl;
+					_targetElementBCR = _targetElement.getBoundingClientRect();
+				}
+			}
+			// 	Constructor code:
+			function MouseTarget(targetElement) {
+				parseTargetElement(targetElement);
+			}
+			MouseTarget.prototype = Object.create(this.constructor.prototype);
+			MouseTarget.prototype.constructor = MouseTarget;
+			// 	Properties getters:
+			Object.defineProperty(MouseTarget.prototype, 'x', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.x : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'y', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.y : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'width', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.width : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'height', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.height : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'target', {
+				get: function() { 
+					return _targetElement ? _targetElement : null; 
+				},
+				set: function(newTarget) {
+					parseTargetElement(newTarget);
+				}
+			});
+			Object.defineProperty(MouseTarget.prototype, 'top', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.top : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'bottom', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.bottom : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'left', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.left : null; 
+				},
+			});
+			Object.defineProperty(MouseTarget.prototype, 'right', {
+				get: function() { 
+					return _targetElementBCR ? _targetElementBCR.right : null; 
+				},
+			});
+			// 	Public methods:
+			MouseTarget.prototype.leftMost = function(otherTarget) {
+				if(otherTarget && otherTarget.x) {
+					if(this.x) {
+						if(this.x < otherTarget.x) {
+							return this;
+						} else {
+							return otherTarget;
+						}
+					} else {
+						throw new Error("This MouseTarget instance has x property undefined.");
+					}
+				}
+			}
+			MouseTarget.prototype.rightMost = function(otherTarget) {
+				if(otherTarget && otherTarget.x) {
+					if(this.x) {
+						if(this.x > otherTarget.x) {
+							return this;
+						} else {
+							return otherTarget;
+						}
+					} else {
+						throw new Error("This MouseTarget instance has x property undefined.");
+					}
+				}
+			}
+			MouseTarget.prototype.topMost = function(otherTarget) {
+				if(otherTarget && otherTarget.y) {
+					if(this.y) {
+						if(this.y < otherTarget.y) {
+							return this;
+						} else {
+							return otherTarget;
+						}
+					} else {
+						throw new Error("This MouseTarget instance has y property undefined.");
+					}
+				}
+			}
+			MouseTarget.prototype.bottomMost = function(otherTarget) {
+				if(otherTarget && otherTarget.y) {
+					if(this.y) {
+						if(this.y > otherTarget.y) {
+							return this;
+						} else {
+							return otherTarget;
+						}
+					} else {
+						throw new Error("This MouseTarget instance has y property undefined.");
+					}
+				}
+			}
+			return new MouseTarget(targetElement);
+		}
+
+		
+		let SelectedCellsManager = (function(SpreadSheet) {
+			let mouseDownTarget = new MouseTarget();
+			let mouseUpTarget = new MouseTarget();
+			let cellsHighlighter = document.createElement("div");
+			cellsHighlighter.classList.add("cellsHighlighter");
+			let containerBCR = SpreadSheet.container.getBoundingClientRect();
+			SpreadSheet.container.appendChild(cellsHighlighter);
+			let meInit = 0;
+			let validSelection = false;
+			function setCellSelectionEvents(dataTables) {
+				let _qtyDataTables = 0;
+				if(dataTables && dataTables.constructor === Array) {
+					_qtyDataTables = dataTables.length;
+				}
+				for(_curTable = 0; _curTable < _qtyDataTables; _curTable++) {
+					let mouseDownCallback = mouseEventCallback.bind(null, mouseDownTarget, startUpdatingHighlighter);
+					dataTables[_curTable].addEventListener("mousedown", mouseDownCallback);
+
+					let mouseUpCallback = mouseEventCallback.bind(null, mouseUpTarget, stopUpdatingHighlighter);
+					dataTables[_curTable].addEventListener("mouseup", mouseUpCallback);
+				}
+			}
+
+			function startUpdatingHighlighter() {
+				validSelection = true;
+				meInit = SpreadSheet.container.scrollTop;
+				
+				document.addEventListener("mousemove", redrawHighlighter);
+				// shall add document.addeventlistener "mouseup", to clean if the user moused up outside the table
+				document.addEventListener("mouseup", resetHighlighter);
+			}
+
+			function resetHighlighter(evt) {
+				document.removeEventListener("mousemove", redrawHighlighter);
+				document.removeEventListener("mouseup", resetHighlighter);
+				validSelection = false;
+			}
+
+			function redrawHighlighter(evt) {
+				mouseEventCallback(mouseUpTarget, updateCellsHighlighter, evt);
+			}
+
+			function stopUpdatingHighlighter(evt) {
+				document.removeEventListener("mousemove", redrawHighlighter);
+				document.removeEventListener("mouseup", resetHighlighter);
+				if(validSelection) {
+					updateCellsHighlighter();
+				}
+				validSelection = false;
+			}
+
+			function mouseEventCallback(mouseTarget, eventCallback, evt) {
+				evt.preventDefault();
+				evt.stopPropagation();
+				if(	evt.target && evt.target.tagName && 
+				   (evt.target.tagName.toLowerCase() === "td" || 
+					evt.target.tagName.toLowerCase() === "th")) {
+					//	Valid target cell. Save it. 
+					mouseTarget.target = evt.target;
+					if(eventCallback) {
+						eventCallback(evt);
+					}
+				}
+			}
+
+			function updateCellsHighlighter() {
+				setTimeout(function() {
+					let mouseDownTargetYPos = mouseDownTarget.y - init + window.scrollY + meInit;
+					let mouseUpTargetYPos = mouseUpTarget.y - init + window.scrollY + SpreadSheet.container.scrollTop;
+					let leftTarget = mouseDownTarget.leftMost(mouseUpTarget);
+					let rightTarget = mouseDownTarget.rightMost(mouseUpTarget);
+					let topTarget = (mouseDownTargetYPos < mouseUpTargetYPos) ? mouseDownTarget : mouseUpTarget;
+					let bottomTarget = (topTarget === mouseUpTarget) ? mouseDownTarget : mouseUpTarget;
+					
+					let leftOffset = leftTarget.left - containerBCR.left - 1;
+					let widthCalc = rightTarget.right - leftTarget.left + 3;
+
+					let topOffset = (mouseDownTargetYPos < mouseUpTargetYPos) ? mouseDownTargetYPos : mouseUpTargetYPos;
+					topOffset -= containerBCR.y + 1;
+					let heightCalc = Math.abs(mouseUpTargetYPos - mouseDownTargetYPos) + 3 + bottomTarget.height;
+
+					cellsHighlighter.style.cssText += 	"width: " + widthCalc + "px; " + 
+														"height: " + heightCalc + "px; " +
+														"left: " + leftOffset + "px; " +
+														"top: " + topOffset + "px; " +
+														"visibility: visible";
+				}, 0);
+			}
+			setCellSelectionEvents(SpreadSheet.dataTables);
+		})(SpreadSheet);
+	</script>
+</body>
+</html>
